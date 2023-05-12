@@ -24,11 +24,17 @@ namespace ChatIconPatch
         [HarmonyPatch(typeof(MyDedicatedServerBase), "OnConnectedClient")]
         public static bool Prefix(ref MyDedicatedServerBase __instance, ref ConnectedClientDataMsg msg, ulong steamId)
         {
-            if (!Char.IsLetter(msg.Name[0]))
+            if (!Char.IsLetter(msg.Name[0]) && !Char.IsNumber(msg.Name[0]))
             {
                 msg.Name = msg.Name.Substring(1);
+                MyIdentity identity = MySession.Static.Players.TryGetPlayerIdentity(new MyPlayer.PlayerId(steamId));
+                if (identity != null)
+                {
+                    identity.SetDisplayName(msg.Name);
+                }
+                
             }
-
+            
             return true;
         }
     }
